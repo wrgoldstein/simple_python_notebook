@@ -1,0 +1,42 @@
+<script>
+	export let name;
+
+	let text
+	let output
+
+	function sendText(){
+		fetch('/python', {
+            method: 'POST',
+            headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+				'x-csrf-token': window.csrfToken
+			},
+            body: JSON.stringify({ command: text })
+        })
+        .then(resp => resp.json())
+        .then(s => {
+			console.log(s)
+			output = s.stdout || s.stderr
+		})
+	}
+</script>
+
+<style>
+	h1 {
+		color: black;
+	}
+
+	textarea {
+		width: 50vw;
+		height: 25vh;
+	}
+</style>
+
+<div>
+    <div>
+        <textarea bind:value={text} placeholder="Write you some Python"></textarea>
+        <textarea bind:value={output}></textarea>
+    </div>
+    <button on:click={sendText}>Submit cell</button>
+</div>

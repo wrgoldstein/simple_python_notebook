@@ -1,3 +1,5 @@
+# Ripped with minor tweaks from https://repl.it/@altendky/Capture-codeInteractiveConsole-output
+
 import code
 import io
 import sys
