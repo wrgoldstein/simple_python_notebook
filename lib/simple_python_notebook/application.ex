@@ -11,9 +11,10 @@ defmodule SimplePythonNotebook.Application do
       # Start the Ecto repository
       SimplePythonNotebook.Repo,
       # Start the endpoint when the application starts
-      SimplePythonNotebookWeb.Endpoint
+      SimplePythonNotebookWeb.Endpoint,
       # Starts a worker by calling: SimplePythonNotebook.Worker.start_link(arg)
       # {SimplePythonNotebook.Worker, arg},
+      SimplePythonNotebook.Console
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

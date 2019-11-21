@@ -2,7 +2,7 @@ defmodule SimplePythonNotebookWeb.Router do
   use SimplePythonNotebookWeb, :router
 
   pipeline :browser do
-    plug :accepts, ["html"]
+    plug :accepts, ["html", "json"]
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
@@ -17,6 +17,7 @@ defmodule SimplePythonNotebookWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    post "/python", PageController, :python
   end
 
   # Other scopes may use custom stacks.
