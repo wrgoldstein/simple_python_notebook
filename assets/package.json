@@ -1,0 +1,21 @@
+{
+  "repository": {},
+  "license": "MIT",
+  "scripts": {
+    "deploy": "rollup -c assets/rollup.config.js",
+    "watch": "rollup -c assets/rollup.config.js -w"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html"
+  },
+  "devDependencies": {
+    "rollup": "1.11",
+    "rollup-plugin-commonjs": "9.2.0",
+    "rollup-plugin-css-only": "1.0.0",
+    "rollup-plugin-node-resolve": "4.2.3",
+    "rollup-plugin-svelte": "5.0.3",
+    "svelte": "3.2.2"
+  }
+}
