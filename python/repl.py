@@ -4,6 +4,8 @@ import code
 import io
 import sys
 
+import IPython
+
 
 class Stream:
     @classmethod
@@ -32,7 +34,8 @@ class Stream:
 
 class Console:
     def __init__(self):
-        self.console = code.InteractiveConsole()
+        # self.console = code.InteractiveConsole()
+        self.console = IPython.core.interactiveshell.InteractiveShell()
         
         self.stdout = Stream()
         self.stderr = Stream()
@@ -46,7 +49,7 @@ class Console:
 
         result = None
         try:
-            result = self.console.runcode(*args, **kwargs)
+            result = self.console.run_cell(*args, **kwargs)
         except SyntaxError:
             self.console.showsyntaxerror()
         except:
@@ -60,16 +63,18 @@ class Console:
 
 c = Console()
 
-def run(command):   
+def run(command):
+    result = None
     command = command.decode()
     if not command.endswith("\n"):
         command += "\n"
     try:
-        c.runcode(code.compile_command(command))
+        result = c.runcode(command)
     except:
         pass
     
     return {
+            "result": result.result,
             "stdout": c.stdout.read(),
             "stderr": c.stderr.read()
         }

@@ -1,5 +1,5 @@
 <script>
-	export let name;
+	import Codemirror from "./codemirror/Codemirror.html"
 
 	let text
 	let output
@@ -20,6 +20,11 @@
 			output = s.stdout || s.stderr
 		})
 	}
+
+	function on_change(cm){
+		text = cm.getValue()
+	}
+
 </script>
 
 <style>
@@ -31,12 +36,13 @@
 		width: 50vw;
 		height: 25vh;
 	}
+
 </style>
 
 <div>
-    <div>
-        <textarea bind:value={text} placeholder="Write you some Python"></textarea>
-        <textarea bind:value={output}></textarea>
-    </div>
-    <button on:click={sendText}>Submit cell</button>
+	<div>
+		<Codemirror mode="python" on_change={on_change}></Codemirror>
+		<textarea bind:value={output}></textarea>
+	</div>
+	<button on:click={sendText}>Send me</button>
 </div>
