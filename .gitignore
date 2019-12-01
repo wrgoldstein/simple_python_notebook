@@ -17,3 +17,5 @@ erl_crash.dump
 /python/__pycache__
 .elixir_ls/
 .env
+
+.ipynb_checkpoints

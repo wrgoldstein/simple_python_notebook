@@ -6,6 +6,7 @@
     "watch": "rollup -c assets/rollup.config.js -w"
   },
   "dependencies": {
+    "ansi_up": "^4.0.4",
     "codemirror": "^5.49.2",
     "keymaster": "^1.6.2",
     "lodash": "^4.17.15",

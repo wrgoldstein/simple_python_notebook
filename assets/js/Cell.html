@@ -1,8 +1,10 @@
 <script>
 	import Codemirror from "./codemirror/Codemirror.html"
+	import AnsiUp from "ansi_up"
 
-	let text
-	let output
+	const ansiup = new AnsiUp()
+
+	let text, stdout, stderr, result
 
 	function sendText(){
 		fetch('/python', {
@@ -16,8 +18,9 @@
         })
         .then(resp => resp.json())
         .then(s => {
-			console.log(s)
-			output = s.stdout || s.stderr
+			stdout = s.stdout.replace(new RegExp('\n', 'g'), '')
+			stderr = s.stderr
+			result = s.result
 		})
 	}
 
@@ -28,21 +31,17 @@
 </script>
 
 <style>
-	h1 {
-		color: black;
+	.stdout {
+		font-family: mono;
 	}
-
-	textarea {
-		width: 50vw;
-		height: 25vh;
-	}
-
 </style>
 
 <div>
 	<div>
 		<Codemirror mode="python" on_change={on_change}></Codemirror>
-		<textarea bind:value={output}></textarea>
+		<div class="stdout">
+			{@html stdout}
+		</div>
 	</div>
 	<button on:click={sendText}>Send me</button>
 </div>
