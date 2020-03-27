@@ -16,10 +16,14 @@ defmodule SimplePythonNotebookWeb.PageController do
   def python(conn, params) do
     command = params["command"]
     result = SimplePythonNotebook.Console.run(command)
+    IO.inspect(result)
+    # There will be more payload parsing todo
     result = %{
-      stdout: result['stdout'] |> to_string(),
-      stderr: result['stderr'] |> to_string(),
-      result: result['result'] |> charlist_to_string(),
+      status: result['status'] |> charlist_to_string(),
+      stdout: result['stdout'] |> charlist_to_string(),
+      stderr: result['stderr'] |> charlist_to_string(),
+      payload: result['payload']
+        |> Enum.map(fn x -> x['data']['text/plain'] |> charlist_to_string() end)
     }
     json(conn, result)
   end

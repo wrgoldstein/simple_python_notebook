@@ -4,7 +4,7 @@
 
 	const ansiup = new AnsiUp()
 
-	let text, stdout, stderr, result
+	let text, stdout, stderr, payload
 
 	function sendText(){
 		fetch('/python', {
@@ -18,9 +18,12 @@
         })
         .then(resp => resp.json())
         .then(s => {
-			stdout = s.stdout.replace(new RegExp('\n', 'g'), '')
+      console.log(s)
+			stdout = s.stdout //.replace(new RegExp('\n', 'g'), '')
 			stderr = s.stderr
-			result = s.result
+      payload = s.payload.map(s => 
+        s//.replace(new RegExp('\n', 'g'), '')
+      )
 		})
 	}
 
@@ -33,15 +36,31 @@
 <style>
 	.stdout {
 		font-family: mono;
-	}
+  }
 </style>
 
 <div>
 	<div>
-		<Codemirror mode="python" on_change={on_change}></Codemirror>
-		<div class="stdout">
-			{@html stdout}
-		</div>
+    <Codemirror mode="python" on_change={on_change}></Codemirror>
+    {#if stdout}
+      <div class="stdout">
+        {@html stdout }
+      </div>
+    {/if}
+    {#if stderr}
+      <div class="stderr">
+        {@html stderr }
+      </div>
+    {/if}
+    {#if payload}
+      <div class="payload">
+        {#each payload as load}
+          <pre>
+            {@html ansiup.ansi_to_html(load) }
+          </pre>
+        {/each}
+      </div>
+    {/if}
 	</div>
 	<button on:click={sendText}>Send me</button>
 </div>

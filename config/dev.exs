@@ -24,7 +24,6 @@ config :simple_python_notebook, SimplePythonNotebookWeb.Endpoint,
     node: [
       "node_modules/rollup/bin/rollup",
       "-c",
-      "-w",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]

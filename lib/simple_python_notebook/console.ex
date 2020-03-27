@@ -7,7 +7,7 @@ defmodule SimplePythonNotebook.Console do
   
     def run(command) do
       Agent.get(__MODULE__, fn pid ->
-        :python.call(pid, :'python.repl', :run, [command]) 
+        :python.call(pid, :'python.repl', :run, [command])
       end)
     end
     
@@ -17,6 +17,7 @@ defmodule SimplePythonNotebook.Console do
   
     def connect(connection) do
       {:ok, pid} = :python.start()
+      :python.call(pid, :'python.repl', :setup, []) 
       pid
     end
   end
