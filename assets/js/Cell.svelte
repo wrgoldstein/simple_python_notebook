@@ -43,6 +43,7 @@
 
   function _on_change(cm) {
     text = cm.getValue();
+    console.log({ uuid, text, client_id })
     if (last_update == text) return
     channel.push("update", { uuid, text, client_id })
   }

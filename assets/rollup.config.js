@@ -11,7 +11,7 @@ const onwarn = warning => {
 }
 
 module.exports = {
-    input: ['js/app.js', 'js/index.js'],
+    input: ['js/app.js', 'js/index.js', 'css/global.css'],
     output: {
       dir: '../priv/static/js',
       sourcemap: true,
@@ -36,7 +36,8 @@ module.exports = {
     resolve({
       mainFields: ['module', 'main']
     }),
-    css({output: '../priv/static/css/app.css'}),
+    css({exclude: "**/global.css", output: '../priv/static/css/app.css'}),
+    css({include: "**/global.css", output: '../priv/static/css/global.css'}),
     commonjs({
       // search for files other than .js files (must already
       // be transpiled by a previous plugin!)

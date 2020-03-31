@@ -18,10 +18,12 @@
       editor = cm.fromTextArea(textarea, {
           mode: mode,
           theme: 'idea',
-          lineNumbers: false
+          lineNumbers: true,
+          viewportMargin: Infinity
       });
 
       editor.on("change", on_change)
+      console.log(editor)
   });
 </script>
 
@@ -29,6 +31,10 @@
     #root {
         height: auto;
         border: 1px solid black;
+    }
+
+    textarea {
+      height: auto;
     }
 </style>
 
