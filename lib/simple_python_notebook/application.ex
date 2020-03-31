@@ -14,7 +14,8 @@ defmodule SimplePythonNotebook.Application do
       SimplePythonNotebookWeb.Endpoint,
       # Starts a worker by calling: SimplePythonNotebook.Worker.start_link(arg)
       # {SimplePythonNotebook.Worker, arg},
-      SimplePythonNotebook.Console
+      SimplePythonNotebook.Console,
+      SimplePythonNotebook.State
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

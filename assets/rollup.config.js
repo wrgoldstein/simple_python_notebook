@@ -20,7 +20,13 @@ module.exports = {
   onwarn,
   plugins: [
     resolve({
-      mainFields: ['module', 'main']
+      mainFields: ['module', 'main'],
+      customResolveOptions: {
+        moduleDirectory: [
+          "deps/phoenix/priv/static",
+          "deps/phoenix_html/priv/static"
+        ]
+      }
     }),
     svelte({
       css:  function(css){
