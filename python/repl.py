@@ -12,18 +12,14 @@ import json
 import contextlib
 from io import StringIO
 
-@contextlib.contextmanager
-def capture():
-    oldout,olderr = sys.stdout, sys.stderr
-    try:
-        out=[StringIO(), StringIO()]
-        sys.stdout,sys.stderr = out
-        yield out
-    finally:
-        sys.stdout,sys.stderr = oldout, olderr
-        out[0] = out[0].getvalue()
-        out[1] = out[1].getvalue()
+class CaptureIO:
+  def __init__(self):
+    self.io = []
 
+  def capture(self, output):
+    content = output['content']
+    msg_type = output['msg_type']
+    self.io.append(dict(content=content, msg_type=msg_type))
 
 client = None
 
@@ -46,10 +42,23 @@ TIMEOUT = 500
 
 def run(bcmd):
   cmd = bcmd.decode()
-  with capture() as (out, err):
-    msg = client.execute_interactive(cmd)
-    out.seek(0), err.seek(0)
-    msg['content']['stdout'] = out.read()
-    msg['content']['stderr'] = err.read()
-    out.flush(), err.flush()
-    return msg['content']
+  cap = CaptureIO()
+  msg = client.execute_interactive(cmd, output_hook=cap.capture)
+  cap.capture(msg)
+  return encode(cap.io)
+
+
+def encode(thing):
+  """
+  Makes sure all strings are encoded for passing
+  back to elixir.
+  """
+  if type(thing) == str: return thing.encode()
+  if type(thing) == list:
+    return [encode(subthing) for subthing in thing]
+  if type(thing) == dict:
+    return dict(
+      [(encode(k), encode(v)) for k,v in thing.items()]
+    )
+  else:
+    return thing

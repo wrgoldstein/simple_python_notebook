@@ -30,7 +30,6 @@
 <style>
     #root {
         height: auto;
-        border: 1px solid black;
     }
 
     textarea {

@@ -2,3 +2,17 @@
   border: 1px solid #eee;
   height: auto;
 }
+
+table {
+  border-collapse: collapse;
+  margin: auto;
+}
+
+td {
+  min-width: 5em;
+  padding: 4px;
+}
+
+th {
+  padding: 4px
+}

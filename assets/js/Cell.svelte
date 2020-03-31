@@ -10,8 +10,7 @@
 
   const ansiup = new AnsiUp();
 
-  let stdout, stderr, payload;
-
+  let outputs = []
   let last_update
 
   channel.on("update", resp => {
@@ -35,9 +34,8 @@
     })
       .then(resp => resp.json())
       .then(s => {
-        stdout = s.stdout; //.replace(new RegExp('\n', 'g'), '')
-        stderr = s.stderr;
-        payload = s.payload;
+        outputs = s
+        console.log(outputs)
       });
   }
 
@@ -52,15 +50,48 @@
 </script>
 
 <style>
-  .stdout {
-    font-family: mono;
+  button {
+    margin-top: 1em;
+    float: right;
+  }
+
+  .table {
+    max-width: 100%;
+    overflow: scroll;
   }
 </style>
 
 <div>
   <div>
     <Codemirror bind:editor={cm} {text} mode="python" {on_change} />
-    {#if stdout}
+    <button on:click={sendText}>Send me</button>
+    {#each outputs as output }
+      {#if output.msg_type == 'execute_result'}
+        <pre>{output.content.data['text/plain']}</pre>
+      {:else if output.msg_type == 'stream'}
+        <pre>{output.content.text}</pre>
+      {:else if output.msg_type == 'display_data'}
+        {#if "image/png" in output.content.data }
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <img src="data:image/png;base64,{output.content.data["image/png"]}">
+        {:else if "text/html" in output.content.data }
+          <div class="table">
+            { @html output.content.data['text/html'] }
+          </div>
+        {/if}
+      {:else if output.msg_type == 'error'}
+        <pre>
+          { @html ansiup.ansi_to_html(output.content.traceback.join("\n")) }
+        </pre>
+      {:else if output.msg_type == 'execute_reply'}
+        {#each output.content.payload as payload }
+          <pre>
+            {@html ansiup.ansi_to_html(payload.data['text/plain'])}
+          </pre>
+        {/each}
+      {/if}
+    {/each }
+    <!-- {#if stdout}
       <div class="stdout">
         {@html stdout}
       </div>
@@ -78,7 +109,6 @@
           </pre>
         {/each}
       </div>
-    {/if}
+    {/if} -->
   </div>
-  <button on:click={sendText}>Send me</button>
 </div>

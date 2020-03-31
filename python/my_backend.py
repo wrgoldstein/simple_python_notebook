@@ -29,3 +29,4 @@ class _BackendAgg(_Backend):
     def show(close=None, block=None):
         for figure_manager in Gcf.get_all_fig_managers():
             display(figure_manager.canvas.figure)
+
