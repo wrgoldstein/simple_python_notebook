@@ -19,7 +19,20 @@
 
   function add_cell(){
     const uuid = generateUID()
-    cells.set($cells.set(uuid, { text: '' , uuid }))
+    const i = $cells.size
+    const cell = { i, uuid, text: '', outputs: [] }
+    channel.push("add", cell)
+  }
+
+  function set_cells(state){
+    state.forEach(cell => {
+      cells.set($cells.set(cell.uuid, cell))
+    })
+  }
+
+  function update_state(resp){
+    client_id = resp.client_id;
+    (resp.state.length == 0) ? add_cell() : set_cells(resp.state)
   }
 
   /*
@@ -37,18 +50,18 @@
     // Now that you are connected, you can join channels with a topic:
     channel = $socket.channel("room:boom", {})
     channel.join()
-      .receive("ok", resp => { 
-        client_id = resp.client_id
-        if (resp.state.length == 0) {
-          add_cell()
-        } else {
-          resp.state.forEach(cell => {
-            cells.set($cells.set(cell.uuid, cell))
-          })
-        }
-        console.log("Joined successfully", resp) 
-      })
+      .receive("ok", update_state)
       .receive("error", resp => { console.log("Unable to join", resp) })
+
+    channel.on("add", resp => {
+      cells.set($cells.set(resp.uuid, resp))
+    })
+
+    channel.on("remove", resp => {
+      const temp = $cells
+      temp.delete(resp.uuid)
+      cells.set(temp)
+    })
   })
   export let name;
 </script>
@@ -61,7 +74,7 @@
 
 <h1>Hello {name}!</h1>
 {#each Array.from($cells.values()) as cell, i (cell.uuid) }
-  <Cell {client_id} uuid={cell.uuid} {channel}/>
+  <Cell {i} {client_id} uuid={cell.uuid} {channel}/>
 {/each}
 
 <button on:click={add_cell}>Add cell</button>

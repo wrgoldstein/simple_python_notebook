@@ -14,7 +14,6 @@
   export let textarea, editor
 
   onMount(() => {
-    console.log('initialize with ', text)
       editor = cm.fromTextArea(textarea, {
           mode: mode,
           theme: 'idea',
@@ -23,7 +22,6 @@
       });
 
       editor.on("change", on_change)
-      console.log(editor)
   });
 </script>
 

@@ -4,7 +4,7 @@
   import { cells } from "./stores"
   import _ from "lodash"
 
-  export let uuid, channel, client_id
+  export let i, uuid, channel, client_id
   let cm
   let text = $cells.get(uuid).text
 
@@ -13,37 +13,39 @@
   let outputs = []
   let last_update
 
-  channel.on("update", resp => {
+  function for_me(resp){
     const from_me = resp.client_id == client_id
     const for_this_cell = resp.uuid == uuid
-    if (!from_me && for_this_cell){
+    console.log(from_me, for_this_cell, resp, uuid)
+    return !from_me && for_this_cell
+  }
+
+  channel.on("update", resp => {
+    if (for_me(resp)){
       text = last_update = resp.text
       cm.setValue(text)
     }
   })
 
-  function sendText() {
-    fetch("/python", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "x-csrf-token": window.csrfToken
-      },
-      body: JSON.stringify({ command: text })
-    })
-      .then(resp => resp.json())
-      .then(s => {
-        outputs = s
-        console.log(outputs)
-      });
+  channel.on("results", resp => {
+    console.log(resp)
+    if (resp.uuid == uuid){
+      outputs = resp.results
+    }
+  })
+
+  function send_text() {
+    channel.push("execute", { i, uuid, text, client_id })
+  }
+
+  function remove_me(){
+    channel.push("remove", { i, uuid, text, client_id })
   }
 
   function _on_change(cm) {
     text = cm.getValue();
-    console.log({ uuid, text, client_id })
     if (last_update == text) return
-    channel.push("update", { uuid, text, client_id })
+    channel.push("update", { i, uuid, text, client_id })
   }
   const on_change = _.debounce(_on_change, 100)
 
@@ -64,7 +66,8 @@
 <div>
   <div>
     <Codemirror bind:editor={cm} {text} mode="python" {on_change} />
-    <button on:click={sendText}>Send me</button>
+    <button on:click={remove_me}>✕</button>
+    <button on:click={send_text}>Send me</button>
     {#each outputs as output }
       {#if output.msg_type == 'execute_result'}
         <pre>{output.content.data['text/plain']}</pre>
@@ -91,24 +94,5 @@
         {/each}
       {/if}
     {/each }
-    <!-- {#if stdout}
-      <div class="stdout">
-        {@html stdout}
-      </div>
-    {/if}
-    {#if stderr}
-      <div class="stderr">
-        {@html stderr}
-      </div>
-    {/if}
-    {#if payload}
-      <div class="payload">
-        {#each payload as load}
-          <pre>
-            {@html ansiup.ansi_to_html(load)}
-          </pre>
-        {/each}
-      </div>
-    {/if} -->
   </div>
 </div>

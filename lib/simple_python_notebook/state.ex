@@ -10,7 +10,24 @@ defmodule SimplePythonNotebook.State do
   end
 
   def update(payload) do
-    # This will be more complex with multiple cells
-    Agent.update(__MODULE__, fn state -> [payload] end)
+    position = payload["i"]
+    new = Map.take(payload, ["text", "uuid", "outputs"])
+    Agent.update(__MODULE__, fn state -> 
+      current = Enum.at(state, position)
+      if current && current["uuid"] == payload["uuid"] do
+        List.replace_at(state, position, payload)
+      else
+        List.insert_at(state, position, payload)
+      end
+    end)
+  end
+
+  def add_cell(payload) do
+  end
+
+  def remove(payload) do
+    Agent.update(__MODULE__, fn state -> 
+      List.delete_at(state, payload["i"])
+    end)
   end
 end
