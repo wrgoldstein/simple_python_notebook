@@ -21,9 +21,8 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   def handle_in("execute", payload, socket) do
     results = payload["text"] |> SimplePythonNotebook.Console.run()
     cell = Map.put(payload, "outputs", results)
-    SimplePythonNotebook.State.update(payload)
-    results = Map.put(payload, :results, results)
-    Endpoint.broadcast("room:boom", "results", results)
+    SimplePythonNotebook.State.update(cell)
+    Endpoint.broadcast("room:boom", "results", cell)
     {:noreply, socket}
   end
 

@@ -25,6 +25,7 @@
   }
 
   function set_cells(state){
+    console.log(state)
     state.forEach(cell => {
       cells.set($cells.set(cell.uuid, cell))
     })
@@ -67,14 +68,22 @@
 </script>
 
 <style>
-	h1 {
-		color: black;
-	}
+#header {
+  font-family: 'Comic Neue';
+  font-size: 16px;
+  color: grey;
+  border-bottom: 1px solid lightgrey;
+}
 </style>
 
-<h1>Hello {name}!</h1>
+
+<p id="header">Shared session python notebook demo</p>
 {#each Array.from($cells.values()) as cell, i (cell.uuid) }
-  <Cell {i} {client_id} uuid={cell.uuid} {channel}/>
+  <Cell {i}
+        {client_id}
+        uuid={cell.uuid}
+        outputs={cell.outputs}
+        {channel}/>
 {/each}
 
 <button on:click={add_cell}>Add cell</button>

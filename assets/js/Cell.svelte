@@ -4,19 +4,21 @@
   import { cells } from "./stores"
   import _ from "lodash"
 
-  export let i, uuid, channel, client_id
+  export let i, uuid, channel, client_id, outputs
   let cm
   let text = $cells.get(uuid).text
 
   const ansiup = new AnsiUp();
 
-  let outputs = []
+  outputs = outputs || []
+
+  console.log(outputs)
+
   let last_update
 
   function for_me(resp){
     const from_me = resp.client_id == client_id
     const for_this_cell = resp.uuid == uuid
-    console.log(from_me, for_this_cell, resp, uuid)
     return !from_me && for_this_cell
   }
 
@@ -28,9 +30,9 @@
   })
 
   channel.on("results", resp => {
-    console.log(resp)
     if (resp.uuid == uuid){
-      outputs = resp.results
+      console.log(resp)
+      outputs = resp.outputs
     }
   })
 
@@ -87,7 +89,7 @@
           { @html ansiup.ansi_to_html(output.content.traceback.join("\n")) }
         </pre>
       {:else if output.msg_type == 'execute_reply'}
-        {#each output.content.payload as payload }
+        {#each (output.content.payload || []) as payload }
           <pre>
             {@html ansiup.ansi_to_html(payload.data['text/plain'])}
           </pre>
