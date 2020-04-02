@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import phx from "phoenix";
   import Cell from "./Cell.svelte"
-  import { socket, cells } from "./stores"
+  import { socket, cells } from "../stores"
 
 
   let channel, client_id
@@ -79,10 +79,6 @@
   align-self: center;
   height: 3em;
   min-width: 5em;
-}
-
-button:focus {
-  outline: 0;
 }
 
 spacer {

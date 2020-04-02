@@ -18,3 +18,7 @@ td {
 th {
   padding: 4px
 }
+
+button:focus {
+  outline: 0;
+}

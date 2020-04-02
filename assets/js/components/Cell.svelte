@@ -1,7 +1,7 @@
 <script>
-  import Codemirror from "./codemirror/Codemirror.svelte";
-  import AnsiUp from "ansi_up";
-  import { cells } from "./stores";
+  import Codemirror from "./Codemirror.svelte";
+  import Outputs from "./Outputs.svelte"
+  import { cells } from "../stores";
   import _ from "lodash";
 
   export let i, uuid, channel, client_id, outputs, mode;
@@ -41,13 +41,9 @@
     The content of the cell
   */
 
-  let cm, flavor;
+  let cm
+  let flavor = 'markdown'
   let text = $cells.get(uuid).text;
-
-  const ansiup = new AnsiUp();
-
-  outputs = outputs || [];
-
   let last_update;
 
   function for_me(resp) {
@@ -92,48 +88,30 @@
     float: right;
   }
 
-  .table {
-    max-width: 100%;
-    overflow: scroll;
-  }
-
   .view {
     display: none;
+  }
+
+  .flavor {
+    color: grey;
+  }
+
+  .active {
+    color: black;
   }
 </style>
 
 <div>
   <div>
+    <div style='display: flex; font-family: monospace;'>
+      <button class:flavor class:active={flavor == 'python'} on:click={() => flavor = 'python'}>python</button>
+      <button class:flavor class:active={flavor == 'markdown'} on:click={() => flavor = 'markdown'}>markdown</button>
+    </div>
     <div class:view={mode == 'view'}>
-      <Codemirror bind:editor={cm} {text} mode="python" {on_change} />
+      <Codemirror bind:editor={cm} {text} mode={flavor} {on_change} />
     </div>
     <button on:click={remove_me}>✕</button>
     <button on:click={send_text}>Send me</button>
-    {#each outputs as output}
-      {#if output.msg_type == 'execute_result'}
-        <pre>{output.content.data['text/plain']}</pre>
-      {:else if output.msg_type == 'stream'}
-        <pre>{output.content.text}</pre>
-      {:else if output.msg_type == 'display_data'}
-        {#if 'image/png' in output.content.data}
-          <!-- svelte-ignore a11y-missing-attribute -->
-          <img src="data:image/png;base64,{output.content.data['image/png']}" />
-        {:else if 'text/html' in output.content.data}
-          <div class="table">
-            {@html output.content.data['text/html']}
-          </div>
-        {/if}
-      {:else if output.msg_type == 'error'}
-        <pre>
-          {@html ansiup.ansi_to_html(output.content.traceback.join('\n'))}
-        </pre>
-      {:else if output.msg_type == 'execute_reply'}
-        {#each output.content.payload || [] as payload}
-          <pre>
-            {@html ansiup.ansi_to_html(payload.data['text/plain'])}
-          </pre>
-        {/each}
-      {/if}
-    {/each}
+    <Outputs {outputs} />
   </div>
 </div>

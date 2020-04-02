@@ -1,14 +1,14 @@
 <script>
   import cm from "codemirror";
-  import './codemirror.css';
   import 'codemirror/lib/codemirror.css';
   import 'codemirror/mode/sql/sql.js';
   import 'codemirror/mode/python/python.js';
+  import 'codemirror/mode/markdown/markdown.js';
   import 'codemirror/theme/idea.css'; 
   import key from "keymaster";
   import _ from "lodash"
   
-  import { onMount } from 'svelte'
+  import { afterUpdate, onMount } from 'svelte'
   
   export let id, mode, on_change, text
   export let textarea, editor
@@ -22,7 +22,11 @@
       });
 
       editor.on("change", on_change)
-  });
+  })
+
+  afterUpdate(() => {
+    if (editor) editor.setOption('mode', mode)
+  })
 </script>
 
 <style>
