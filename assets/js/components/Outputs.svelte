@@ -1,4 +1,8 @@
 <script>
+  import Prism from "prismjs"
+  import "prismjs/components/prism-python"
+  import "prismjs/themes/prism.css";
+  import "katex";
   import AnsiUp from "ansi_up";
   export let outputs
 

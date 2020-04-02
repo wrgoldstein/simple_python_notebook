@@ -1,9 +1,9 @@
 <script>
   import Codemirror from "./Codemirror.svelte";
   import Outputs from "./Outputs.svelte"
+  import { mark } from "../helpers.mjs"
   import { cells } from "../stores";
   import _ from "lodash";
-
   export let i, uuid, channel, client_id, outputs, mode;
   /*
   Cell component for individual python REPL
@@ -67,7 +67,20 @@
   });
 
   function send_text() {
-    channel.push("execute", { i, uuid, text, client_id });
+    if ( flavor == 'markdown'){
+      const outputs = [{
+        msg_type: 'display_data',
+        content: {
+          data: {
+            'text/html': mark(text)
+          }
+        }
+      }]
+      console.log('m', mark(text))
+      channel.push("results", { i, uuid, text, client_id, outputs })
+    } else {
+      channel.push("execute", { i, uuid, text, client_id });
+    }
   }
 
   function remove_me() {
