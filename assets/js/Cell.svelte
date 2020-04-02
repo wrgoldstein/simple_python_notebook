@@ -4,15 +4,13 @@
   import { cells } from "./stores"
   import _ from "lodash"
 
-  export let i, uuid, channel, client_id, outputs
+  export let i, uuid, channel, client_id, outputs, mode
   let cm
   let text = $cells.get(uuid).text
 
   const ansiup = new AnsiUp();
 
   outputs = outputs || []
-
-  console.log(outputs)
 
   let last_update
 
@@ -63,11 +61,17 @@
     max-width: 100%;
     overflow: scroll;
   }
+
+  .view {
+    display: none;
+  }
 </style>
 
 <div>
   <div>
-    <Codemirror bind:editor={cm} {text} mode="python" {on_change} />
+    <div class:view={mode == 'view'}>
+      <Codemirror bind:editor={cm} {text} mode="python" {on_change} />
+    </div>
     <button on:click={remove_me}>✕</button>
     <button on:click={send_text}>Send me</button>
     {#each outputs as output }

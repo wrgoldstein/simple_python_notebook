@@ -6,6 +6,7 @@
 
 
   let channel, client_id
+  let mode = "edit"
 
   function generateUID() {
     // I generate the UID from two parts here 
@@ -74,16 +75,38 @@
   color: grey;
   border-bottom: 1px solid lightgrey;
 }
+
+.mode-button {
+  align-self: center;
+  height: 3em;
+  min-width: 5em;
+}
+
+button:focus {
+  outline: 0;
+}
+
+spacer {
+  width: 1em;
+}
 </style>
 
 
 <p id="header">Shared session python notebook demo</p>
+<div style='display: flex; font-family: monospace;'>
+  <p>mode: { mode }</p>
+  <spacer />
+  <button class="mode-button" on:click={() => mode = 'edit'}>edit</button>
+  <button class="mode-button" on:click={() => mode = 'view'}>view</button>
+</div>
 {#each Array.from($cells.values()) as cell, i (cell.uuid) }
   <Cell {i}
         {client_id}
         uuid={cell.uuid}
         outputs={cell.outputs}
-        {channel}/>
+        {channel}
+        {mode}
+  />
 {/each}
 
 <button on:click={add_cell}>Add cell</button>
