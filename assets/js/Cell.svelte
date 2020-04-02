@@ -5,7 +5,43 @@
   import _ from "lodash";
 
   export let i, uuid, channel, client_id, outputs, mode;
-  let cm;
+  /*
+  Cell component for individual python REPL
+
+  Props
+  ----------
+  i: integer
+    The position of this cell
+
+  uuid: string
+    The unique identifier of this cell
+
+  channel: phoenix.Socket.channel
+    The room (notebook) this session is in
+
+  client_id: string
+    The unique identifier of the client
+
+  outputs: array[object]
+    Outputs from executed code (from ipython kernel)
+
+    This is only provided as a prop when loading
+    initial state
+
+  mode: string
+    One of ['view', 'edit']
+
+
+  Variables
+  ----------
+  flavor: string
+    One of ['python', 'markdown']
+
+  text: string
+    The content of the cell
+  */
+
+  let cm, flavor;
   let text = $cells.get(uuid).text;
 
   const ansiup = new AnsiUp();

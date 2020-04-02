@@ -26,7 +26,6 @@
   }
 
   function set_cells(state){
-    console.log(state)
     state.forEach(cell => {
       cells.set($cells.set(cell.uuid, cell))
     })
