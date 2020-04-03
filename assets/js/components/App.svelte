@@ -93,6 +93,12 @@
 spacer {
   width: 1em;
 }
+
+main {
+  width: 60%;
+  min-width: 600px;
+  margin: auto;
+}
 </style>
 
 
@@ -105,17 +111,19 @@ spacer {
   <spacer />
   <button class="mode-button right wide" on:click={() => console.log('run')}>run all</button>
 </div>
-{#each Array.from($cells.values()) as cell, i (cell.uuid) }
-  <Cell {i}
-        {client_id}
-        uuid={cell.uuid}
-        outputs={cell.outputs}
-        {channel}
-        {mode}
-        flavor={cell.flavor}
-  />
-{/each}
+<main>
+  {#each Array.from($cells.values()) as cell, i (cell.uuid) }
+    <Cell {i}
+          {client_id}
+          uuid={cell.uuid}
+          outputs={cell.outputs}
+          {channel}
+          {mode}
+          flavor={cell.flavor}
+    />
+  {/each}
 
-{#if mode == 'edit'}
-  <button on:click={add_cell}>Add cell</button>
-{/if}
+  {#if mode == 'edit'}
+    <button on:click={add_cell}>Add cell</button>
+  {/if}
+</main>

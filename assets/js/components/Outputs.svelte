@@ -1,5 +1,6 @@
 <script>
   import Prism from "prismjs"
+  import Chart from "svelte-charts"
   import "prismjs/components/prism-python"
   import "prismjs/themes/prism.css";
   import "katex";
@@ -9,6 +10,16 @@
   const ansiup = new AnsiUp();
 
   outputs = outputs || [];
+
+  function parse_svelte_props(output){
+    const json = output.content.data['application/json']
+    if (!json.kind) return ''
+    return {
+
+    }
+  }
+
+  $: console.log(outputs)
 
   function handleRichOutput(html){
     /*
@@ -32,17 +43,32 @@
   max-width: 100%;
   overflow: scroll;
 }
+
+.chart {
+  height: 15em;
+  width: 90%;
+  margin: auto;
+}
+
+.stdout {
+  font-family: roboto;
+}
 </style>
 
 {#each outputs as output}
   {#if output.msg_type == 'execute_result'}
-    {#if "text/plain" in output.content.data}
-      { @html handleRichOutput(output.content.data['text/html']) }
+    {#if "application/json" in output.content.data}
+      <div class="chart">
+        <Chart 
+          data={output.content.data['application/json'].data}
+          kind={output.content.data['application/json'].kind}
+        />
+      </div>
     {:else}
       <pre>{output.content.data['text/plain']}</pre>
     {/if}
   {:else if output.msg_type == 'stream'}
-    <pre>{output.content.text}</pre>
+    <pre class="stdout">{output.content.text}</pre>
   {:else if output.msg_type == 'display_data'}
     {#if 'image/png' in output.content.data}
       <!-- svelte-ignore a11y-missing-attribute -->
