@@ -21,11 +21,12 @@
   function add_cell(){
     const uuid = generateUID()
     const i = $cells.size
-    const cell = { i, uuid, text: '', outputs: [] }
+    const cell = { i, uuid, text: '', outputs: [], flavor: 'python' }
     channel.push("add", cell)
   }
 
   function set_cells(state){
+    console.log(state)
     state.forEach(cell => {
       cells.set($cells.set(cell.uuid, cell))
     })
@@ -78,7 +79,15 @@
 .mode-button {
   align-self: center;
   height: 3em;
-  min-width: 5em;
+  min-width: 8em;
+}
+
+.right {
+  float: right;
+}
+
+.wide {
+  min-width: 10em;
 }
 
 spacer {
@@ -88,11 +97,13 @@ spacer {
 
 
 <p id="header">Shared session python notebook demo</p>
-<div style='display: flex; font-family: monospace;'>
-  <p>mode: { mode }</p>
+<div style='font-family: monospace;'>
+  <span>mode: { mode }</span>
   <spacer />
   <button class="mode-button" on:click={() => mode = 'edit'}>edit</button>
   <button class="mode-button" on:click={() => mode = 'view'}>view</button>
+  <spacer />
+  <button class="mode-button right wide" on:click={() => console.log('run')}>run all</button>
 </div>
 {#each Array.from($cells.values()) as cell, i (cell.uuid) }
   <Cell {i}
@@ -101,7 +112,10 @@ spacer {
         outputs={cell.outputs}
         {channel}
         {mode}
+        flavor={cell.flavor}
   />
 {/each}
 
-<button on:click={add_cell}>Add cell</button>
+{#if mode == 'edit'}
+  <button on:click={add_cell}>Add cell</button>
+{/if}

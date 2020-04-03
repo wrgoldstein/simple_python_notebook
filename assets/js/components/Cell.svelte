@@ -4,7 +4,7 @@
   import { mark } from "../helpers.mjs"
   import { cells } from "../stores";
   import _ from "lodash";
-  export let i, uuid, channel, client_id, outputs, mode;
+  export let i, uuid, channel, client_id, outputs, mode, flavor
   /*
   Cell component for individual python REPL
 
@@ -42,9 +42,19 @@
   */
 
   let cm
-  let flavor = 'markdown'
   let text = $cells.get(uuid).text;
   let last_update;
+
+  function me(){
+    return { i, uuid, text, client_id, outputs, flavor }
+  }
+  
+  function flavorize(language){
+    return () => {
+      flavor = language
+      channel.push("update", me());
+    }
+  }
 
   function for_me(resp) {
     const from_me = resp.client_id == client_id;
@@ -55,20 +65,20 @@
   channel.on("update", resp => {
     if (for_me(resp)) {
       text = last_update = resp.text;
+      flavor = resp.flavor
       cm.setValue(text);
     }
   });
 
   channel.on("results", resp => {
     if (resp.uuid == uuid) {
-      console.log(resp);
       outputs = resp.outputs;
     }
   });
 
   function send_text() {
     if ( flavor == 'markdown'){
-      const outputs = [{
+      outputs = [{
         msg_type: 'display_data',
         content: {
           data: {
@@ -76,21 +86,20 @@
           }
         }
       }]
-      console.log('m', mark(text))
-      channel.push("results", { i, uuid, text, client_id, outputs })
+      channel.push("results", me())
     } else {
-      channel.push("execute", { i, uuid, text, client_id });
+      channel.push("execute", me());
     }
   }
 
   function remove_me() {
-    channel.push("remove", { i, uuid, text, client_id });
+    channel.push("remove", { i, uuid, client_id });
   }
 
   function _on_change(cm) {
     text = cm.getValue();
     if (last_update == text) return;
-    channel.push("update", { i, uuid, text, client_id });
+    channel.push("update", { ...me(), text });
   }
   const on_change = _.debounce(_on_change, 100);
 </script>
@@ -116,15 +125,19 @@
 
 <div>
   <div>
-    <div style='display: flex; font-family: monospace;'>
-      <button class:flavor class:active={flavor == 'python'} on:click={() => flavor = 'python'}>python</button>
-      <button class:flavor class:active={flavor == 'markdown'} on:click={() => flavor = 'markdown'}>markdown</button>
-    </div>
+    {#if mode == 'edit'}
+      <div style='display: flex; font-family: monospace;'>
+        <button class:flavor class:active={flavor == 'python'} on:click={flavorize('python')}>python</button>
+        <button class:flavor class:active={flavor == 'markdown'} on:click={flavorize('markdown')}>markdown</button>
+      </div>
+    {/if}
     <div class:view={mode == 'view'}>
       <Codemirror bind:editor={cm} {text} mode={flavor} {on_change} />
     </div>
-    <button on:click={remove_me}>✕</button>
-    <button on:click={send_text}>Send me</button>
+    {#if mode == 'edit'}
+      <button on:click={remove_me}>✕</button>
+      <button on:click={send_text}>Send me</button>
+    {/if}
     <Outputs {outputs} />
   </div>
 </div>

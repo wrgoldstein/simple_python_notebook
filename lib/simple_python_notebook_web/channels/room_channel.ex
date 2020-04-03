@@ -37,4 +37,10 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
     Endpoint.broadcast("room:boom", "remove", payload)
     {:noreply, socket}
   end
+
+  def handle_in("results", payload, socket) do
+    SimplePythonNotebook.State.update(payload)
+    Endpoint.broadcast("room:boom", "results", payload)
+    {:noreply, socket}
+  end
 end

@@ -45,6 +45,7 @@ def run(bcmd):
   cap = CaptureIO()
   msg = client.execute_interactive(cmd, output_hook=cap.capture)
   cap.capture(msg)
+  print(cap.io)
   return encode(cap.io)
 
 

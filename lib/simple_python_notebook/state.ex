@@ -11,7 +11,6 @@ defmodule SimplePythonNotebook.State do
 
   def update(payload) do
     position = payload["i"]
-    new = Map.take(payload, ["text", "uuid", "outputs"])
     Agent.update(__MODULE__, fn state -> 
       current = Enum.at(state, position)
       if current && current["uuid"] == payload["uuid"] do
@@ -23,6 +22,8 @@ defmodule SimplePythonNotebook.State do
   end
 
   def add_cell(payload) do
+    position = payload["i"]
+    # Must increment "i" for all other cells..
   end
 
   def remove(payload) do

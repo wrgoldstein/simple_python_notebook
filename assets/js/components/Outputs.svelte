@@ -10,7 +10,21 @@
 
   outputs = outputs || [];
 
-
+  function handleRichOutput(html){
+    /*
+      This is a hack to handle arbitrary 
+      html and javascript plots. 
+      
+      (!) It's unsafe.
+    */
+    const re = /((.|\n*)+)<script.*>((.|\n*)+)<\/script>/
+    const match = html.match(re)
+    if (!match) return html
+    const html_ = match[1]
+    const script = match[3]
+    setTimeout(() => eval(script), 20)
+    return html_
+  }
 </script>
 
 <style>
@@ -22,7 +36,11 @@
 
 {#each outputs as output}
   {#if output.msg_type == 'execute_result'}
-    <pre>{output.content.data['text/plain']}</pre>
+    {#if "text/plain" in output.content.data}
+      { @html handleRichOutput(output.content.data['text/html']) }
+    {:else}
+      <pre>{output.content.data['text/plain']}</pre>
+    {/if}
   {:else if output.msg_type == 'stream'}
     <pre>{output.content.text}</pre>
   {:else if output.msg_type == 'display_data'}
