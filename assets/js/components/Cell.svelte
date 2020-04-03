@@ -132,7 +132,7 @@
       </div>
     {/if}
     <div class:view={mode == 'view'}>
-      <Codemirror bind:editor={cm} {text} mode={flavor} {on_change} />
+      <Codemirror on:submit={send_text} bind:editor={cm} {text} mode={flavor} {on_change} />
     </div>
     {#if mode == 'edit'}
       <button on:click={remove_me}>✕</button>
