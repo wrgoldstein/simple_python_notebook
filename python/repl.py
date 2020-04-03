@@ -12,6 +12,13 @@ import json
 import contextlib
 from io import StringIO
 
+
+# TODO splonky.py is currently at
+# ~/.ipython/splonky.py
+# so that it's picked up by the
+# ipython kernel. 
+
+
 class CaptureIO:
   def __init__(self):
     self.io = []
@@ -45,7 +52,6 @@ def run(bcmd):
   cap = CaptureIO()
   msg = client.execute_interactive(cmd, output_hook=cap.capture)
   cap.capture(msg)
-  print(cap.io)
   return encode(cap.io)
 
 

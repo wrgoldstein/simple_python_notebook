@@ -1,0 +1,40 @@
+todo
+----------
+
+Good for demoing:
+- (!) interactivity (inputs)
+- figure out a chart construction solution
+  * that doesnt suck
+  * (to go straight from sql query to view)
+- hot keys (need to have cell focus variable and visual)
+  * submit
+  * switch modes
+  * commenting
+  * autocomplete? (nice to have)
+- plan a ui for
+  * split notebook experience
+  * viewer experience
+  * discovery
+ 
+Necessary:
+- save files (as .ipynb)
+  * github right away? flat files?
+  * if committing, we'll have to distinguish
+   between your dirty version and the clean version
+   end users see
+- multiple rooms, multiple kernels
+- restarting kernels
+- permalink
+- better cursor visibility
+  * and show cursor in other clients
+
+Additional features?
+- add native sql support?
+- add commenting?
+- authentication? organizations?
+- add your own requirements.txt
+- add stylesheet
+- better real time support (csrd?)
+  * at least make sure we have a timestamp on updates
+
+  

@@ -26,6 +26,12 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("save", payload, socket) do
+    state = SimplePythonNotebook.State.get()
+    Endpoint.broadcast("room:boom", "add", payload)
+    {:noreply, socket}
+  end
+
   def handle_in("add", payload, socket) do
     SimplePythonNotebook.State.update(payload)
     Endpoint.broadcast("room:boom", "add", payload)
