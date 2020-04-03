@@ -1,13 +1,15 @@
 defmodule SimplePythonNotebook.Registry do
   use GenServer
 
+
+
   # Client API
 
   @doc """
   Starts the registry.
   """
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   @doc """
@@ -15,19 +17,31 @@ defmodule SimplePythonNotebook.Registry do
 
   Returns `{:ok, pid}` if the bucket exists, `:error` otherwise.
   """
-  def lookup(server, kernel_id) do
-    GenServer.call(server, {:lookup, kernel_id})
+  def lookup(kernel_id) do
+    GenServer.call(__MODULE__, {:lookup, kernel_id})
   end
 
   @doc """
   Ensures there is a bucket associated with the given `kernel_id` in `server`.
   """
-  def create(server, kernel_id) do
-    GenServer.call(server, {:create, kernel_id})
+  def create(kernel_id) do
+    GenServer.call(__MODULE__, {:create, kernel_id})
   end
 
-  def run(server, kernel_id, command) do
-    GenServer.call(server, {:run, kernel_id, command})
+  def restart(kernel_id) do
+    GenServer.call(__MODULE__, {:restart, kernel_id})
+  end
+
+  def run(kernel_id, command) do
+    GenServer.call(__MODULE__, {:run, kernel_id, command})
+  end
+
+  defp start_and_monitor(kernel_id, {kernels, refs}) do
+    {:ok, pid, ospid} = SimplePythonNotebook.Kernel.start()
+    ref = Process.monitor(pid)
+    refs = Map.put(refs, ref, {kernel_id, ospid})
+    kernels = Map.put(kernels, kernel_id, {pid, ospid})
+    {:reply, pid, {kernels, refs}}
   end
 
   # Server API
@@ -42,26 +56,34 @@ defmodule SimplePythonNotebook.Registry do
   @impl true
   def handle_call({:lookup, kernel_id}, _from, state) do
     {kernels, _} = state
-    pid = Map.fetch(kernels, kernel_id)
+    {pid, _} = Map.fetch(kernels, kernel_id)
     {:reply, pid, state}
   end
 
   @impl true
   def handle_call({:create, kernel_id}, _from, {kernels, refs}) do
     if Map.has_key?(kernels, kernel_id) do
-      {:reply, Map.fetch(kernels, kernel_id), {kernels, refs}}
-    else
-      {:ok, pid} = SimplePythonNotebook.Kernel.start()
-      ref = Process.monitor(pid)
-      refs = Map.put(refs, ref, kernel_id)
-      kernels = Map.put(kernels, kernel_id, pid)
+      {:ok, {pid, _}} = Map.fetch(kernels, kernel_id)
       {:reply, pid, {kernels, refs}}
+    else
+      start_and_monitor(kernel_id, {kernels, refs})
     end
   end
 
-  @impl true
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, {names, refs}) do
-    {name, refs} = Map.pop(refs, ref)
+  def handle_call({:restart, kernel_id}, _from, state) do
+    {kernels, refs} = state
+    if Map.has_key?(kernels, kernel_id) do
+      {pid, ospid} = Map.fetch(kernels, kernel_id)
+      Agent.stop(pid)
+      start_and_monitor(kernel_id, state)
+    else
+      start_and_monitor(kernel_id, state)
+    end
+  end
+
+  def handle_info({:DOWN, ref, :process, pid, reason}, {names, refs}) do
+    {{name, ospid}, refs} = Map.pop(refs, ref)
+    System.cmd("kill", ["#{ospid}"])
     names = Map.delete(names, name)
     {:noreply, {names, refs}}
   end

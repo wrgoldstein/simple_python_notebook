@@ -19,7 +19,8 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   end
 
   def handle_in("execute", payload, socket) do
-    results = payload["text"] |> SimplePythonNotebook.Console.run()
+    pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
+    results = SimplePythonNotebook.Kernel.run(pid, payload["text"])
     cell = Map.put(payload, "outputs", results)
     SimplePythonNotebook.State.update(cell)
     Endpoint.broadcast("room:boom", "results", cell)
@@ -28,7 +29,7 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
 
   def handle_in("save", payload, socket) do
     state = SimplePythonNotebook.State.get()
-    Endpoint.broadcast("room:boom", "add", payload)
+    Endpoint.broadcast("room:boom", "saved", payload)
     {:noreply, socket}
   end
 
@@ -47,6 +48,12 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   def handle_in("results", payload, socket) do
     SimplePythonNotebook.State.update(payload)
     Endpoint.broadcast("room:boom", "results", payload)
+    {:noreply, socket}
+  end
+
+  def handle_in("restart", _payload, socket) do
+    Endpoint.broadcast("room:boom", "restarting", %{})
+    SimplePythonNotebook.Registry.restart()
     {:noreply, socket}
   end
 end

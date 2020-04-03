@@ -14,7 +14,7 @@ defmodule SimplePythonNotebook.Application do
       SimplePythonNotebookWeb.Endpoint,
       # Starts a worker by calling: SimplePythonNotebook.Worker.start_link(arg)
       # {SimplePythonNotebook.Worker, arg},
-      SimplePythonNotebook.Console,
+      SimplePythonNotebook.Supervisor,
       SimplePythonNotebook.State
     ]
 

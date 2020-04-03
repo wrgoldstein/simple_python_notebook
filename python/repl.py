@@ -1,12 +1,8 @@
-# > python -m ipykernel
-# will give a PID you can use to connect below
-# rather than create a new process with the 
-# kernel = ... statement.
-
 from jupyter_client import BlockingKernelClient
 from jupyter_core import paths
 from subprocess import Popen, PIPE
 import sys, os
+import re
 from time import sleep
 import json
 import contextlib
@@ -27,6 +23,9 @@ class CaptureIO:
     content = output['content']
     msg_type = output['msg_type']
     self.io.append(dict(content=content, msg_type=msg_type))
+  
+  def clear(self):
+    self.io = []
 
 client = None
 
@@ -43,7 +42,8 @@ def setup():
   client.load_connection_file()
   client.start_channels()
   client.wait_for_ready()
-  return connection_file
+  os_process_id = re.findall('.*\/kernel-(\d+)\.json$', connection_file)[0]
+  return os_process_id
 
 TIMEOUT = 500
 

@@ -30,11 +30,14 @@ Necessary:
 
 Additional features?
 - add native sql support?
+  * extra modes for the top cell
+    - database explorer?
 - add commenting?
 - authentication? organizations?
 - add your own requirements.txt
 - add stylesheet
 - better real time support (csrd?)
   * at least make sure we have a timestamp on updates
-
+- scheduler
+- expose an api (deploy models off this system)
   

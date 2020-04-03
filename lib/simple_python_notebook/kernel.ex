@@ -1,8 +1,8 @@
 defmodule SimplePythonNotebook.Kernel do
   def start() do
-    {:ok, pid} = :python.start()
-    :python.call(pid, :'python.repl', :setup, []) 
-    {:ok, pid}
+    {:ok, erl_pid} = :python.start()
+    py_pid = :python.call(erl_pid, :'python.repl', :setup, []) 
+    {:ok, erl_pid, py_pid}
   end
 
   @doc """
