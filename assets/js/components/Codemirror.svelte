@@ -16,6 +16,14 @@
   export let textarea, editor
 
   const dispatch = createEventDispatcher();
+  function betterTab(cm) {
+    if (cm.somethingSelected()) {
+      cm.indentSelection("add");
+    } else {
+      cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+        Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+    }
+  }
 
   onMount(() => {
       editor = cm.fromTextArea(textarea, {
@@ -25,7 +33,8 @@
           viewportMargin: Infinity,
           extraKeys: {
             "Cmd-/": (e) => e.toggleComment(),
-            "Shift-Enter": (e) => dispatch('submit')
+            "Shift-Enter": (e) => dispatch('submit'),
+            Tab: betterTab
           }
       });
 
