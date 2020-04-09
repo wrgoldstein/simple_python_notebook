@@ -9,10 +9,9 @@ import contextlib
 from io import StringIO
 
 
-# TODO splonky.py is currently at
-# ~/.ipython/splonky.py
-# so that it's picked up by the
-# ipython kernel. 
+load_splonky = """
+
+"""
 
 
 class CaptureIO:
@@ -43,6 +42,7 @@ def setup():
   client.start_channels()
   client.wait_for_ready()
   os_process_id = re.findall('.*\/kernel-(\d+)\.json$', connection_file)[0]
+  client.execute_interactive(load_splonky)
   return os_process_id
 
 TIMEOUT = 500

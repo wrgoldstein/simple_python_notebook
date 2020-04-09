@@ -13,6 +13,12 @@ body {
   height: auto;
 }
 
+.CodeMirror-cursor {
+  border-left: thin solid black;
+  border-right: none;
+  width: 0;
+}
+
 table {
   border-collapse: collapse;
   margin: auto;

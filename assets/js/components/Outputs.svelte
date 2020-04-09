@@ -5,7 +5,17 @@
   import "prismjs/themes/prism.css";
   import "katex";
   import AnsiUp from "ansi_up";
-  export let outputs
+  import Slider from "./dynamic/Slider.svelte";
+  import _ from "lodash";
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
+  
+  const kinds = {
+    Slider
+  }
+
+  export let outputs, channel
 
   const ansiup = new AnsiUp();
 
@@ -19,23 +29,12 @@
     }
   }
 
-  $: console.log(outputs)
-
-  function handleRichOutput(html){
-    /*
-      This is a hack to handle arbitrary 
-      html and javascript plots. 
-      
-      (!) It's unsafe.
-    */
-    const re = /((.|\n*)+)<script.*>((.|\n*)+)<\/script>/
-    const match = html.match(re)
-    if (!match) return html
-    const html_ = match[1]
-    const script = match[3]
-    setTimeout(() => eval(script), 20)
-    return html_
+  function forward(event){
+    dispatch("update", event.detail)
   }
+
+  const state = {}
+
 </script>
 
 <style>
@@ -54,16 +53,14 @@
   font-family: roboto;
 }
 </style>
-
 {#each outputs as output}
   {#if output.msg_type == 'execute_result'}
     {#if "application/json" in output.content.data}
-      <div class="chart">
-        <Chart 
-          data={output.content.data['application/json'].data}
-          kind={output.content.data['application/json'].kind}
-        />
-      </div>
+      <svelte:component
+        on:update={forward}
+        this={kinds[output.content.data['application/json'].kind]}
+        {...output.content.data['application/json'].data}
+      />
     {:else}
       <pre>{output.content.data['text/plain']}</pre>
     {/if}
@@ -84,9 +81,14 @@
     </pre>
   {:else if output.msg_type == 'execute_reply'}
     {#each output.content.payload || [] as payload}
-      <pre>
-        {@html ansiup.ansi_to_html(payload.data['text/plain'])}
-      </pre>
+      {#if payload.data}
+        <pre>
+          {@html ansiup.ansi_to_html(payload.data['text/plain'])}
+        </pre>
+      {:else}
+        <!-- {keepkernel: 0, source: "ask_exit"} means kernel dead -->
+        kernel dead ?{JSON.stringify(payload)}
+      {/if}
     {/each}
   {/if}
 {/each}

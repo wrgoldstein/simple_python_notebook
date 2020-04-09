@@ -27,6 +27,30 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("dynamics", payload, socket) do
+    i = payload["dyn_i"]
+    value = payload["dyn_v"]
+    pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
+    cmd = """
+    spl.lock = False
+    setattr(spl, "#{i}", #{value})
+    spl.lock = True
+    """
+    IO.inspect(cmd)
+    dynamic_update_result = SimplePythonNotebook.Kernel.run(pid, cmd)
+    IO.puts("-------------------------")
+    IO.inspect(dynamic_update_result)
+    IO.puts("-------------------------")
+    results = SimplePythonNotebook.Kernel.run(pid, payload["text"])
+    IO.inspect(results)
+    IO.puts("-------------------------")
+    IO.puts("-------------------------")
+    cell = Map.put(payload, "outputs", results)
+    SimplePythonNotebook.State.update(cell)
+    Endpoint.broadcast("room:boom", "results", cell)
+    {:noreply, socket}
+  end
+
   def handle_in("save", payload, socket) do
     state = SimplePythonNotebook.State.get()
     Endpoint.broadcast("room:boom", "saved", payload)

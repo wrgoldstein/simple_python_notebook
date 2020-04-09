@@ -96,12 +96,21 @@
     channel.push("remove", { i, uuid, client_id });
   }
 
-  function _on_change(cm) {
+  const on_change = _.debounce((cm) => {
     text = cm.getValue();
     if (last_update == text) return;
     channel.push("update", { ...me(), text });
-  }
-  const on_change = _.debounce(_on_change, 100);
+  }, 100);
+
+  const propagate_updates = _.debounce((event) =>{
+    console.log(event.detail)
+    const { varname, value } = event.detail
+    channel.push("dynamics", {
+      ...me(),
+      dyn_i: varname,
+      dyn_v: value
+    })
+  }, 100)
 </script>
 
 <style>
@@ -138,6 +147,6 @@
       <button on:click={remove_me}>✕</button>
       <button on:click={send_text}>Send me</button>
     {/if}
-    <Outputs {outputs} />
+    <Outputs on:update={propagate_updates} {outputs} {channel}/>
   </div>
 </div>

@@ -54,13 +54,6 @@ defmodule SimplePythonNotebook.Registry do
   end
 
   @impl true
-  def handle_call({:lookup, kernel_id}, _from, state) do
-    {kernels, _} = state
-    {pid, _} = Map.fetch(kernels, kernel_id)
-    {:reply, pid, state}
-  end
-
-  @impl true
   def handle_call({:create, kernel_id}, _from, {kernels, refs}) do
     if Map.has_key?(kernels, kernel_id) do
       {:ok, {pid, _}} = Map.fetch(kernels, kernel_id)
