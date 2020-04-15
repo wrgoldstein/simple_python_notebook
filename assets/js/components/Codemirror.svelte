@@ -6,6 +6,7 @@
   import 'codemirror/mode/sql/sql.js';
   import 'codemirror/mode/python/python.js';
   import 'codemirror/mode/markdown/markdown.js';
+  import 'codemirror/mode/sql/sql.js';
   import 'codemirror/theme/idea.css'; 
   import key from "keymaster";
   import _ from "lodash"

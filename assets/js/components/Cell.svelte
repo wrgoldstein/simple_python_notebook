@@ -35,7 +35,7 @@
   Variables
   ----------
   flavor: string
-    One of ['python', 'markdown']
+    One of ['python', 'markdown', 'sql']
 
   text: string
     The content of the cell
@@ -142,6 +142,7 @@
       <div style='display: flex; font-family: monospace;'>
         <button class:flavor class:active={flavor == 'python'} on:click={flavorize('python')}>python</button>
         <button class:flavor class:active={flavor == 'markdown'} on:click={flavorize('markdown')}>markdown</button>
+        <button class:flavor class:active={flavor == 'markdown'} on:click={flavorize('sql')}>sql</button>
       </div>
     {/if}
     <div class:view={mode == 'view'}>

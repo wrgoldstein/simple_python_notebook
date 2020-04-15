@@ -35,9 +35,9 @@ def setup():
 
   kernel = Popen([sys.executable, '-m', 'ipykernel'], stdout=PIPE, stderr=PIPE)
   connection_file = os.path.join(
-              paths.jupyter_runtime_dir(),
-              'kernel-%i.json' % kernel.pid,
-          )
+    paths.jupyter_runtime_dir(),
+    'kernel-%i.json' % kernel.pid,
+  )
   sleep(1)
   client = BlockingKernelClient(connection_file=connection_file)
   client.load_connection_file()
@@ -49,13 +49,20 @@ def setup():
 
 TIMEOUT = 500
 
+def run_sql(cell_id, bcmd):
+  cmd = bcmd.decode()
+  cmd = f'rs.get("{cell_id}", """{cmd}""")'
+  cap = CaptureIO()
+  msg = client.execute_interactive(cmd, output_hook=cap.capture)
+  cap.capture(msg)
+  return encode(cap.io)
+
 def run(bcmd):
   cmd = bcmd.decode()
   cap = CaptureIO()
   msg = client.execute_interactive(cmd, output_hook=cap.capture)
   cap.capture(msg)
   return encode(cap.io)
-
 
 def encode(thing):
   """
