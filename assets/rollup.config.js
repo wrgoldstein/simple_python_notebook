@@ -6,6 +6,8 @@ import css from 'rollup-plugin-css-only'
 const onwarn = warning => {
   if (warning.code === 'CIRCULAR_DEPENDENCY' && /moment/.test(warning.importer)) {
     return
+  } else if (warning.code === 'CIRCULAR_DEPENDENCY' && /d3/.test(warning.importer)) {
+    return
   }
   console.warn(`(!) ${warning.message}`)
 }
