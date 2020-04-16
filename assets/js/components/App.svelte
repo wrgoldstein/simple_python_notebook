@@ -7,6 +7,7 @@
 
   let channel, client_id
   let mode = "edit"
+  let alive = false
 
   function generateUID() {
     // I generate the UID from two parts here 
@@ -26,24 +27,21 @@
   }
 
   function set_cells(state){
-    console.log(state)
     state.forEach(cell => {
       cells.set($cells.set(cell.uuid, cell))
     })
   }
 
   function update_state(resp){
+    alive = true
     client_id = resp.client_id;
     (resp.state.length == 0) ? add_cell() : set_cells(resp.state)
   }
 
-  /*
-    Need to be able to
-      - Set state for the first time when logging in
-        * Get each cell and its text
-      - Update state for all subscribers on keystroke
-      - Show where cursor is for each subscriber...
-  */
+  function restart_kernel(resp){
+    alive = false
+    channel.push("restart")
+  }
 
   onMount(() => {
     socket.set(new phx.Socket("/socket", {params: {token: '123'}}))
@@ -64,6 +62,10 @@
       temp.delete(resp.uuid)
       cells.set(temp)
     })
+
+    channel.on("started", resp => {
+      alive = true
+    })
   })
   export let name;
 </script>
@@ -80,6 +82,19 @@
   align-self: center;
   height: 3em;
   min-width: 8em;
+}
+
+.dot {
+  height: 25px;
+  width: 25px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.alive {
+  background-color: #afa;
 }
 
 .right {
@@ -109,7 +124,9 @@ main {
   <button class="mode-button" on:click={() => mode = 'edit'}>edit</button>
   <button class="mode-button" on:click={() => mode = 'view'}>view</button>
   <spacer />
-  <button class="mode-button right wide" on:click={() => console.log('run')}>run all</button>
+  <button disabled class="mode-button right wide" on:click={() => console.log('run')}>run all</button>
+  <button class="mode-button right wide" on:click={restart_kernel}>restart kernel</button>
+  <span class:alive class="dot"></span>
 </div>
 <main>
   {#each Array.from($cells.values()) as cell, i (cell.uuid) }
