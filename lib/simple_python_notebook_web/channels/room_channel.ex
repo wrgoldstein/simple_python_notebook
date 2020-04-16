@@ -36,15 +36,8 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
     setattr(spl, "#{i}", #{value})
     spl.lock = True
     """
-    IO.inspect(cmd)
     dynamic_update_result = SimplePythonNotebook.Kernel.run(pid, cmd)
-    IO.puts("-------------------------")
-    IO.inspect(dynamic_update_result)
-    IO.puts("-------------------------")
     results = SimplePythonNotebook.Kernel.run(pid, payload["text"])
-    IO.inspect(results)
-    IO.puts("-------------------------")
-    IO.puts("-------------------------")
     cell = Map.put(payload, "outputs", results)
     SimplePythonNotebook.State.update(cell)
     Endpoint.broadcast("room:boom", "results", cell)

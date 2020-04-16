@@ -10,7 +10,8 @@ from io import StringIO
 
 
 load_splonky = """
-
+import sys
+sys.path.append('/Users/wgoldstein/wrgoldstein/simple_python_notebook/python')
 """
 
 
@@ -41,8 +42,8 @@ def setup():
   client.load_connection_file()
   client.start_channels()
   client.wait_for_ready()
-  os_process_id = re.findall('.*\/kernel-(\d+)\.json$', connection_file)[0]
   client.execute_interactive(load_splonky)
+  os_process_id = re.findall('.*\/kernel-(\d+)\.json$', connection_file)[0]
   return os_process_id
 
 TIMEOUT = 500
