@@ -1,3 +1,7 @@
+import shortuuid
+
+
+
 import inspect
 
 def retrieve_name(var):
@@ -41,8 +45,15 @@ class spl(metaclass=spltype):
 5 
 """
 
+print("hoolagin")
+
+SplRegistry = {}
+
 # Input Widgets
 class Slider:
+  global SplRegistry
+
+  lookup = {}
   """
   Takes a pandas dataframe and generates json interpreted
   by the splonky client as svelte component data
@@ -51,29 +62,46 @@ class Slider:
   --------
   import splonky as spl
 
-  spl.x = 5
-  spl.Slider(x, 0, 100)
+  spl.Slider(0, 100, 50, lambda x: print(x))
   """
-  def __init__(self, var, min, max):
-    self.value = var
-    self.varname = retrieve_name(var)
+  def __init__(self, min, max, value, f):
+    """
+    Generates an interactive Slider.
+
+    Params
+    =========
+    min: The minimum value of the slider
+    max: The maximum value of the slider
+    value: The default value of the slider
+    f: A one parameter function that is called
+    with the output of the slider.
+
+    """
     self.min = min
     self.max = max
+    self.value = value
+    self.f = f
+    self._id = shortuuid.uuid()
 
-  def data(self):
+    # SplRegistry is instantiated by the client.
+    # Probably should just used a global variable here
+    SplRegistry[self._id] = f
+
+  def data(self) -> dict:
     return {
-      "varname": self.varname,
       "min": self.min,
       "max": self.max,
-      "value": self.value
+      "value": self.value,
+      "id": self._id
     }
   
-  def _repr_json_(self):
-    repr_ = {
+  def _repr_json_(self) -> dict:
+    return {
+      "id": self._id,
+      "spl": True,
       "kind": "Slider",
       "data": self.data()
     }
-    return repr_ 
 
 
 # Graphics

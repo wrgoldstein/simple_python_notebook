@@ -15,7 +15,8 @@
     Slider
   }
 
-  export let outputs, channel
+  export let outputs, channel;
+  export let dynamic_outputs = {};
 
   const ansiup = new AnsiUp();
 
@@ -30,23 +31,19 @@
   }
 
   function forward(event){
-    dispatch("update", event.detail)
+    dispatch("updateComponent", event.detail)
   }
 
   const state = {}
 
+  import { onMount } from "svelte"
+  onMount(() => console.log(outputs))
 </script>
 
 <style>
 .table {
   max-width: 100%;
   overflow: scroll;
-}
-
-.chart {
-  height: 15em;
-  width: 90%;
-  margin: auto;
 }
 
 .stdout {
@@ -57,10 +54,16 @@
   {#if output.msg_type == 'execute_result'}
     {#if "application/json" in output.content.data}
       <svelte:component
-        on:update={forward}
+        on:updateComponent={forward}
         this={kinds[output.content.data['application/json'].kind]}
         {...output.content.data['application/json'].data}
-      />
+      >
+      {#if dynamic_outputs[output.content.data['application/json'].data.id]}
+        <svelte:self
+          outputs={dynamic_outputs[output.content.data['application/json'].data.id]}
+        />
+      {/if}
+      </svelte:component>
     {:else}
       <pre>{output.content.data['text/plain']}</pre>
     {/if}

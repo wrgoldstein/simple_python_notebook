@@ -12,6 +12,7 @@ from io import StringIO
 load_splonky = """
 import sys
 sys.path.append('/Users/wgoldstein/wrgoldstein/simple_python_notebook/python')
+import splonky
 """
 
 

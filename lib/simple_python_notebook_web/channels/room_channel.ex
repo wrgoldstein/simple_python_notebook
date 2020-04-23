@@ -34,19 +34,12 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   end
 
   def handle_in("dynamics", payload, socket) do
-    i = payload["dyn_i"]
-    value = payload["dyn_v"]
+    id = payload["updated_id"]
+    value = payload["updated_value"]
     pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
-    cmd = """
-    spl.lock = False
-    setattr(spl, "#{i}", #{value})
-    spl.lock = True
-    """
-    dynamic_update_result = SimplePythonNotebook.Kernel.run(pid, cmd)
-    results = SimplePythonNotebook.Kernel.run(pid, payload["text"])
-    cell = Map.put(payload, "outputs", results)
-    SimplePythonNotebook.State.update(cell)
-    Endpoint.broadcast("room:boom", "results", cell)
+    cmd = "splonky.SplRegistry['#{id}'](#{value})"
+    result = SimplePythonNotebook.Kernel.run(pid, cmd)
+    Endpoint.broadcast("room:boom", "dynamic_outputs", %{id: id, result: result})
     {:noreply, socket}
   end
 

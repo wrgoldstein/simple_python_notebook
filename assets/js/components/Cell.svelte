@@ -43,7 +43,8 @@
 
   let cm
   let text = $cells.get(uuid).text;
-  let last_update;
+  let last_update
+  let dynamic_outputs = {}
 
   function me(){
     return { i, uuid, text, client_id, outputs, flavor }
@@ -76,6 +77,10 @@
     }
   });
 
+    channel.on("dynamic_outputs", resp => {
+      dynamic_outputs[resp.id] = resp.result;
+    });
+
   function send_text() {
     if ( flavor == 'markdown'){
       outputs = [{
@@ -103,12 +108,11 @@
   }, 100);
 
   const propagate_updates = _.debounce((event) =>{
-    console.log(event.detail)
-    const { varname, value } = event.detail
+    const { updated_id, updated_value } = event.detail
     channel.push("dynamics", {
       ...me(),
-      dyn_i: varname,
-      dyn_v: value
+      updated_id,
+      updated_value
     })
   }, 100)
 </script>
@@ -147,6 +151,10 @@
       <button on:click={remove_me}>✕</button>
       <button on:click={send_text}>Send me</button>
     {/if}
-    <Outputs on:update={propagate_updates} {outputs} {channel}/>
+    <Outputs
+      on:updateComponent={propagate_updates}
+      {outputs}
+      {dynamic_outputs}
+      {channel}/>
   </div>
 </div>

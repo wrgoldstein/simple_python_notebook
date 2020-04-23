@@ -3,7 +3,7 @@
 
 	const dispatch = createEventDispatcher();
 
-  export let id, min, max, value
+  export let id, options, value
 
   /*
   value not updating when slider moves..
@@ -20,7 +20,11 @@
 </script>
 
 <div class="main">
-  <input bind:value={value} on:input={on_change} type="range" {min} {max} />
+  <select>
+    {#each options as option}
+      <option value={option}>{option}</option>
+    {/each}
+  </select>
 </div>
 <slot>
 </slot>

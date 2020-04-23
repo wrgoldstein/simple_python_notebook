@@ -139,7 +139,6 @@ main {
           flavor={cell.flavor}
     />
   {/each}
-
   {#if mode == 'edit'}
     <button on:click={add_cell}>Add cell</button>
   {/if}
