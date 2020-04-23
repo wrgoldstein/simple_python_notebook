@@ -36,6 +36,7 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   def handle_in("dynamics", payload, socket) do
     id = payload["updated_id"]
     value = payload["updated_value"]
+    IO.puts("The value is #{value}!")
     pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
     cmd = "splonky.SplRegistry['#{id}'](#{value})"
     result = SimplePythonNotebook.Kernel.run(pid, cmd)

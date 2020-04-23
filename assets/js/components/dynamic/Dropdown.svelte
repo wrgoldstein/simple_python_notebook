@@ -1,26 +1,23 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
   export let id, options, value
 
-  /*
-  value not updating when slider moves..
-  Try exporting value and using another
-  variable internally?
-  */
-
-  function on_change(event){
+  const updateComponent = () => {
     dispatch('updateComponent', {
       updated_id: id,
-      updated_value: event.target.value
+      updated_value: `'${value}'` // value must be quoted
     })
   }
+
+  onMount(updateComponent)
+  $: updateComponent()
 </script>
 
 <div class="main">
-  <select>
+  <select bind:value={value} on:change={updateComponent}>
     {#each options as option}
       <option value={option}>{option}</option>
     {/each}
@@ -34,7 +31,7 @@
   width: 100%;
 }
 
-input {
+select {
   width: 80%;
 }
 </style>

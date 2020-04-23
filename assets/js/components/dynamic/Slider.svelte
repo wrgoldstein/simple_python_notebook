@@ -1,26 +1,30 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
   export let id, min, max, value
 
-  /*
-  value not updating when slider moves..
-  Try exporting value and using another
-  variable internally?
-  */
-
-  function on_change(event){
+  onMount(() => {
     dispatch('updateComponent', {
       updated_id: id,
-      updated_value: event.target.value
+      updated_value: value
+    })
+  })
+
+  $: {
+
+    dispatch('updateComponent', {
+      updated_id: id,
+      updated_value: value
     })
   }
 </script>
 
 <div class="main">
-  <input bind:value={value} on:input={on_change} type="range" {min} {max} />
+  <label>{min}</label>
+  <input bind:value={value} type="range" {min} {max} />
+  <label>{max}</label>
 </div>
 <slot>
 </slot>

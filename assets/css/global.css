@@ -10,7 +10,13 @@ body {
 .CodeMirror {
   border: 1px solid #eee;
   font-family: 'Fira Code';
+  line-height: 1.3em;
+  font-variant-ligatures: initial;
   height: auto;
+}
+
+.cm-string {
+    font-variant-ligatures: none;
 }
 
 .CodeMirror-cursor {
@@ -35,4 +41,8 @@ th {
 
 button:focus {
   outline: 0;
+}
+
+#App {
+  padding-bottom: 3em;
 }

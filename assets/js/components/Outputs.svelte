@@ -6,13 +6,15 @@
   import "katex";
   import AnsiUp from "ansi_up";
   import Slider from "./dynamic/Slider.svelte";
+  import Dropdown from "./dynamic/Dropdown.svelte";
   import _ from "lodash";
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
   
   const kinds = {
-    Slider
+    Slider,
+    Dropdown
   }
 
   export let outputs, channel;
@@ -37,7 +39,6 @@
   const state = {}
 
   import { onMount } from "svelte"
-  onMount(() => console.log(outputs))
 </script>
 
 <style>
