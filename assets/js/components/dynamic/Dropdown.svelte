@@ -32,6 +32,6 @@
 }
 
 select {
-  width: 80%;
+  min-width: 8em;
 }
 </style>

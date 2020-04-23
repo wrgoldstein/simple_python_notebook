@@ -33,8 +33,4 @@
 .main {
   width: 100%;
 }
-
-input {
-  width: 80%;
-}
 </style>
