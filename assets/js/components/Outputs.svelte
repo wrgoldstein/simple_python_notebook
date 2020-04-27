@@ -7,6 +7,7 @@
   import AnsiUp from "ansi_up";
   import Slider from "./dynamic/Slider.svelte";
   import Dropdown from "./dynamic/Dropdown.svelte";
+  import SqlResult from "./dynamic/SqlResult.svelte";
   import _ from "lodash";
   import { createEventDispatcher } from 'svelte';
 
@@ -15,23 +16,16 @@
   const kinds = {
     Slider,
     Dropdown,
-    Chart
+    Chart,
+    SqlResult
   }
 
-  export let outputs, channel;
+  export let outputs, channel, mode;
   export let dynamic_outputs = {};
 
   const ansiup = new AnsiUp();
 
   outputs = outputs || [];
-
-  function parse_svelte_props(output){
-    const json = output.content.data['application/json']
-    if (!json.kind) return ''
-    return {
-
-    }
-  }
 
   function forward(event){
     dispatch("updateComponent", event.detail)
@@ -45,22 +39,24 @@
       output.content.data['application/json'].spl)
   }
 
-  const state = {}
+$: console.log(outputs)
 </script>
 
 <style>
 .table {
   max-width: 100%;
   overflow: scroll;
+  margin-top: 1em;
+  font-size: .75em;
 }
 
 .stdout {
   font-family: roboto;
 }
 </style>
+
 {#each outputs as output}
   { #if isSpl(output) }
-    { console.log(output)}
     <svelte:component
       on:updateComponent={forward}
       this={kinds[output.content.data['application/json'].kind]}
@@ -73,7 +69,13 @@
     {/if}
     </svelte:component>
   {:else if output.msg_type == 'execute_result'}
-    <pre>{output.content.data['text/plain']}</pre>
+    {#if output.content.data['text/html']}
+      <div class="table">
+          {@html output.content.data['text/html']}
+        </div>
+    {:else}
+      <pre>{output.content.data['text/plain']}</pre>
+    {/if}
   {:else if output.msg_type == 'stream'}
     <pre class="stdout">{output.content.text}</pre>
   {:else if output.msg_type == 'display_data'}

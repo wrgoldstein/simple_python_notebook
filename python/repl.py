@@ -13,6 +13,15 @@ load_splonky = """
 import sys
 sys.path.append('/Users/wgoldstein/wrgoldstein/simple_python_notebook/python')
 import splonky
+from splonky_sql import RS
+
+# This must be in local scope
+# so that global variables are passed!
+def run_sql_and_keep_results(i, sql):
+  name, data = RS.get(i, sql)
+  globals()[name] = data
+  return
+
 """
 
 
@@ -43,18 +52,19 @@ def setup():
   client.load_connection_file()
   client.start_channels()
   client.wait_for_ready()
-  client.execute_interactive(load_splonky)
+  loaded = client.execute_interactive(load_splonky)
+  if loaded['content']['status'] == 'error':
+    raise Exception("Could not load core Splonky libraries")
   os_process_id = re.findall('.*\/kernel-(\d+)\.json$', connection_file)[0]
   return os_process_id
 
 TIMEOUT = 500
 
-def run_sql(cell_id, bcmd):
+def run_sql(i, bcmd):
   cmd = bcmd.decode()
-  cmd = f'rs.get("{cell_id}", """{cmd}""")'
+  cmd = f'run_sql_and_keep_results({i}, """{cmd}""")'
   cap = CaptureIO()
-  msg = client.execute_interactive(cmd, output_hook=cap.capture)
-  cap.capture(msg)
+  outputs = client.execute_interactive(cmd, output_hook=cap.capture)
   return encode(cap.io)
 
 def run(bcmd):

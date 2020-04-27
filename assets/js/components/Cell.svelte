@@ -45,6 +45,7 @@
   let text = $cells.get(uuid).text;
   let last_update
   let dynamic_outputs = {}
+  let status_bar = false;
 
   function me(){
     return { i, uuid, text, client_id, outputs, flavor }
@@ -73,6 +74,7 @@
 
   channel.on("results", resp => {
     if (resp.uuid == uuid) {
+      status_bar = false
       outputs = resp.outputs;
     }
   });
@@ -93,6 +95,8 @@
       }]
       channel.push("results", me())
     } else {
+      status_bar = true
+      outputs = []
       channel.push("execute", me());
     }
   }
@@ -120,7 +124,6 @@
 <style>
   button {
     margin-top: 1em;
-    float: right;
   }
 
   .view {
@@ -142,20 +145,28 @@
       <div style='display: flex; font-family: monospace;'>
         <button class:flavor class:active={flavor == 'python'} on:click={flavorize('python')}>python</button>
         <button class:flavor class:active={flavor == 'markdown'} on:click={flavorize('markdown')}>markdown</button>
-        <button class:flavor class:active={flavor == 'markdown'} on:click={flavorize('sql')}>sql</button>
+        <button class:flavor class:active={flavor == 'sql'} on:click={flavorize('sql')}>sql</button>
+      
+        <div style='margin-left: auto;'>
+          {#if mode == 'edit'}
+            <button on:click={remove_me}>✕</button>
+            <button on:click={send_text}>Send me</button>
+          {/if}
+        </div>
       </div>
     {/if}
     <div class:view={mode == 'view'}>
       <Codemirror on:submit={send_text} bind:editor={cm} {text} mode={flavor} {on_change} />
     </div>
-    {#if mode == 'edit'}
-      <button on:click={remove_me}>✕</button>
-      <button on:click={send_text}>Send me</button>
+    {#if status_bar}
+      Loading...
     {/if}
     <Outputs
       on:updateComponent={propagate_updates}
       {outputs}
       {dynamic_outputs}
-      {channel}/>
+      {channel}
+      {mode}
+      />
   </div>
 </div>

@@ -26,7 +26,11 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
 
   def handle_in("execute", payload, socket) do
     pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
-    results = SimplePythonNotebook.Kernel.run(pid, payload["text"])
+    results = if payload["flavor"] == "sql" do
+      SimplePythonNotebook.Kernel.run_sql(pid, payload["i"], payload["text"])
+    else
+      SimplePythonNotebook.Kernel.run(pid, payload["text"])
+    end
     cell = Map.put(payload, "outputs", results)
     SimplePythonNotebook.State.update(cell)
     Endpoint.broadcast("room:boom", "results", cell)
@@ -36,7 +40,6 @@ defmodule SimplePythonNotebookWeb.RoomChannel do
   def handle_in("dynamics", payload, socket) do
     id = payload["updated_id"]
     value = payload["updated_value"]
-    IO.puts("The value is #{value}!")
     pid = SimplePythonNotebook.Registry.create(socket.assigns.kernel_id)
     cmd = "splonky.SplRegistry['#{id}'](#{value})"
     result = SimplePythonNotebook.Kernel.run(pid, cmd)

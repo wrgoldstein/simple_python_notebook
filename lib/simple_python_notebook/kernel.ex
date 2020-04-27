@@ -12,7 +12,7 @@ defmodule SimplePythonNotebook.Kernel do
     :python.call(pid, :'python.repl', :run, [command])
   end
 
-  def run_sql(pid, cell_id, command) do
-    :python.call(pid, :'python.repl', :run_sql, [cell_id, command])
+  def run_sql(pid, i, command) do
+    :python.call(pid, :'python.repl', :run_sql, [i, command])
   end
 end
