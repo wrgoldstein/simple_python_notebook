@@ -14,7 +14,8 @@
   
   const kinds = {
     Slider,
-    Dropdown
+    Dropdown,
+    Chart
   }
 
   export let outputs, channel;
@@ -36,9 +37,15 @@
     dispatch("updateComponent", event.detail)
   }
 
-  const state = {}
+  const isSpl = (output) => {
+    return !!(
+      output.content &&
+      output.content.data &&
+      output.content.data["application/json"] &&
+      output.content.data['application/json'].spl)
+  }
 
-  import { onMount } from "svelte"
+  const state = {}
 </script>
 
 <style>
@@ -52,22 +59,21 @@
 }
 </style>
 {#each outputs as output}
-  {#if output.msg_type == 'execute_result'}
-    {#if "application/json" in output.content.data}
-      <svelte:component
-        on:updateComponent={forward}
-        this={kinds[output.content.data['application/json'].kind]}
-        {...output.content.data['application/json'].data}
-      >
-      {#if dynamic_outputs[output.content.data['application/json'].data.id]}
-        <svelte:self
-          outputs={dynamic_outputs[output.content.data['application/json'].data.id]}
-        />
-      {/if}
-      </svelte:component>
-    {:else}
-      <pre>{output.content.data['text/plain']}</pre>
+  { #if isSpl(output) }
+    { console.log(output)}
+    <svelte:component
+      on:updateComponent={forward}
+      this={kinds[output.content.data['application/json'].kind]}
+      {...output.content.data['application/json'].data}
+    >
+    {#if dynamic_outputs[output.content.data['application/json'].data.id]}
+      <svelte:self
+        outputs={dynamic_outputs[output.content.data['application/json'].data.id]}
+      />
     {/if}
+    </svelte:component>
+  {:else if output.msg_type == 'execute_result'}
+    <pre>{output.content.data['text/plain']}</pre>
   {:else if output.msg_type == 'stream'}
     <pre class="stdout">{output.content.text}</pre>
   {:else if output.msg_type == 'display_data'}

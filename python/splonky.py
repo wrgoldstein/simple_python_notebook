@@ -129,13 +129,14 @@ class Chart:
     self.df
 
     return {
-      "labels": self.x if self.x else list(self.df.index),
+      "labels": list(self.df.index),
       "datasets": [ {"label": c, "data": list(v.values)} 
         for c,v in self.df.items()]
     }
   
   def _repr_json_(self):
     repr_ = {
+      "spl": True,
       "kind": self.kind,
       "data": self.data()
     }
