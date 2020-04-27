@@ -124,7 +124,6 @@ main {
   <button class="mode-button" on:click={() => mode = 'edit'}>edit</button>
   <button class="mode-button" on:click={() => mode = 'view'}>view</button>
   <spacer />
-  <button disabled class="mode-button right wide" on:click={() => console.log('run')}>run all</button>
   <button class="mode-button right wide" on:click={restart_kernel}>restart kernel</button>
   <span class:alive class="dot"></span>
 </div>
