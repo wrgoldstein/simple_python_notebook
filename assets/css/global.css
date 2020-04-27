@@ -11,6 +11,7 @@ body {
   border: 1px solid #eee;
   font-family: 'Fira Code';
   line-height: 1.3em;
+  font-size: .8em;
   font-variant-ligatures: initial;
   height: auto;
 }
